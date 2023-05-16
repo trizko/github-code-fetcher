@@ -2,7 +2,7 @@ use hyper::service::{make_service_fn, service_fn};
 use hyper::Method;
 use hyper::{Body, Request, Response, Server};
 use reqwest::Client;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::convert::Infallible;
 use url::Url;
 
@@ -11,14 +11,20 @@ struct GithubLink {
     link: String,
 }
 
+
+#[derive(Serialize)]
+struct CodeLines {
+    lines: Vec<String>,
+}
+
 async fn handle_request(req: Request<Body>) -> Result<Response<Body>, Infallible> {
     match (req.method(), req.uri().path()) {
         (&Method::POST, "/fetch_code") => {
             let whole_body = hyper::body::to_bytes(req.into_body()).await.unwrap();
             let github_link: GithubLink = serde_json::from_slice(&whole_body).unwrap();
             let code = fetch_code_from_github(github_link.link).await;
-            Ok(Response::new(Body::from(code)))
-        }
+            let json = serde_json::to_string(&CodeLines { lines: code }).unwrap();
+            Ok(Response::new(Body::from(json)))
         _ => {
             let not_found = "Route not found\n";
             Ok(Response::builder()
@@ -38,7 +44,7 @@ fn parse_numbers(num: &str) -> usize {
         .unwrap()
 }
 
-async fn fetch_code_from_github(link: String) -> String {
+async fn fetch_code_from_github(link: String) -> Vec<String> {
     let url = Url::parse(&link).unwrap();
     let path_parts: Vec<&str> = url.path_segments().unwrap().collect();
     let user = path_parts[0];
@@ -63,15 +69,15 @@ async fn fetch_code_from_github(link: String) -> String {
         .await
         .unwrap();
 
-    let lines: Vec<&str> = text.lines().collect();
-    let code: Vec<&str> = match line_numbers.as_deref() {
-        Some([line]) => vec![lines[line - 1]],
+    let lines: Vec<String> = text.lines().map(|s| s.to_string()).collect();
+    let code: Vec<String> = match line_numbers.as_deref() {
+        Some([line]) => vec![lines[line - 1].clone()],
         Some([start_line, end_line]) => lines[start_line - 1..*end_line].to_vec(),
         None => lines,
         _ => panic!("TODO: non-exhaustive pattern match. please fix"),
     };
 
-    code.join("\n")
+    code
 }
 
 #[tokio::main]
