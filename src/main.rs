@@ -41,26 +41,18 @@ fn parse_numbers(t_num: &str) -> usize {
 async fn fetch_code_from_github(link: String) -> String {
     let url = Url::parse(&link).unwrap();
     let path_parts: Vec<&str> = url.path_segments().unwrap().collect();
-    println!("path_parts: {:?}", path_parts);
     let user = path_parts[0];
-    println!("user: {:?}", user);
     let repo = path_parts[1];
-    println!("repo: {:?}", repo);
     let file_path = &path_parts[3..].join("/");
-    println!("file_path: {:?}", file_path);
     let line_numbers: Vec<&str> = url.fragment().unwrap().split('-').collect();
-    println!("line_numbers: {:?}", line_numbers);
     let start_line = parse_numbers(line_numbers[0]);
-    println!("start_line: {:?}", start_line);
     let end_line = parse_numbers(line_numbers[1]);
-    println!("end_line: {:?}", end_line);
 
     let client = Client::new();
     let raw_url = format!(
         "https://raw.githubusercontent.com/{}/{}/{}",
         user, repo, file_path
     );
-    println!("raw_url: {:?}", raw_url);
     let text = client
         .get(&raw_url)
         .send()
@@ -70,7 +62,6 @@ async fn fetch_code_from_github(link: String) -> String {
         .await
         .unwrap();
     let lines: Vec<&str> = text.lines().collect();
-    println!("lines: {:?}", lines);
     let code: Vec<&str> = lines
         [start_line - 1..end_line]
         .to_vec();
