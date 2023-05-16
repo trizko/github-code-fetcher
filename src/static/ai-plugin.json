@@ -1,7 +1,7 @@
 {
     "schema_version": "v1",
     "name_for_human": "Github Code Fetcher",
-    "name_for_model": "github code fetcher",
+    "name_for_model": "github_code_fetcher",
     "description_for_human": "A ChatGPT plugin for fetching code from Github links.",
     "description_for_model": "A ChatGPT plugin for fetching code from Github links.",
     "auth": {
