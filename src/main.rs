@@ -44,9 +44,10 @@ async fn fetch_code_from_github(link: String) -> String {
     let user = path_parts[0];
     let repo = path_parts[1];
     let file_path = &path_parts[3..].join("/");
-    let line_numbers: Vec<&str> = url.fragment().unwrap().split('-').collect();
-    let start_line = parse_numbers(line_numbers[0]);
-    let end_line = parse_numbers(line_numbers[1]);
+    let line_numbers: Option<Vec<usize>> = match url.fragment() {
+        Some(fragment) => Some(fragment.split('-').map(|n| parse_numbers(n)).collect()),
+        None => None,
+    };
 
     let client = Client::new();
     let raw_url = format!(
@@ -61,10 +62,14 @@ async fn fetch_code_from_github(link: String) -> String {
         .text()
         .await
         .unwrap();
+
     let lines: Vec<&str> = text.lines().collect();
-    let code: Vec<&str> = lines
-        [start_line - 1..end_line]
-        .to_vec();
+    let code: Vec<&str> = match line_numbers.as_deref() {
+        Some([start_line, end_line]) => lines[start_line - 1..*end_line].to_vec(),
+        None => lines,
+        _ => panic!("non-exhaustive pattern match"),
+    };
+
     code.join("\n")
 }
 
