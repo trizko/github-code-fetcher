@@ -29,8 +29,8 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, Infallible
     }
 }
 
-fn parse_numbers(t_num: &str) -> usize {
-    t_num
+fn parse_numbers(num: &str) -> usize {
+    num
         .chars()
         .filter(|a| a.is_digit(10))
         .collect::<String>()
@@ -65,9 +65,10 @@ async fn fetch_code_from_github(link: String) -> String {
 
     let lines: Vec<&str> = text.lines().collect();
     let code: Vec<&str> = match line_numbers.as_deref() {
+        Some([line]) => vec![lines[line - 1]],
         Some([start_line, end_line]) => lines[start_line - 1..*end_line].to_vec(),
         None => lines,
-        _ => panic!("non-exhaustive pattern match"),
+        _ => panic!("TODO: non-exhaustive pattern match. please fix"),
     };
 
     code.join("\n")
