@@ -18,6 +18,7 @@ struct CodeLines {
 }
 
 async fn handle_request(req: Request<Body>) -> Result<Response<Body>, Infallible> {
+    println!("{:?}: {:?}\n headers: {:#?}", req.method(), req.uri().path(), req.headers());
     let mut response = match (req.method(), req.uri().path()) {
         (&Method::POST, "/fetch_code") => {
             let whole_body = hyper::body::to_bytes(req.into_body()).await.unwrap();
@@ -25,6 +26,9 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, Infallible
             let code = fetch_code_from_github(github_link.link).await;
             let json = serde_json::to_string(&CodeLines { lines: code }).unwrap();
             Response::new(Body::from(json))
+        }
+        (&Method::OPTIONS, "/fetch_code") => {
+            Response::new(Body::empty())
         }
         (&Method::GET, "/.well-known/ai-plugin.json") => {
             match fs::read_to_string("./src/static/ai-plugin.json").await {
@@ -59,10 +63,10 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, Infallible
                 .unwrap()
         }
     };
-
     let headers = response.headers_mut();
     set_cors_headers(headers);
-
+    
+    println!("response: {:#?}", response);
     Ok(response)
 }
 
@@ -74,7 +78,7 @@ fn set_cors_headers(headers: &mut HeaderMap) {
     );
     headers.insert(
         header::ACCESS_CONTROL_ALLOW_HEADERS,
-        "Content-Type".parse().unwrap(),
+        "Content-Type,openai-conversation-id,openai-ephemeral-user-id".parse().unwrap(),
     );
 }
 
