@@ -1,17 +1,16 @@
 use hyper::service::{make_service_fn, service_fn};
 use hyper::Method;
-use hyper::{Body, Request, Response, Server, StatusCode};
+use hyper::{header, Body, HeaderMap, Request, Response, Server, StatusCode};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::convert::Infallible;
-use url::Url;
 use tokio::fs;
+use url::Url;
 
 #[derive(Deserialize)]
 struct GithubLink {
     link: String,
 }
-
 
 #[derive(Serialize)]
 struct CodeLines {
@@ -19,45 +18,68 @@ struct CodeLines {
 }
 
 async fn handle_request(req: Request<Body>) -> Result<Response<Body>, Infallible> {
-    match (req.method(), req.uri().path()) {
+    let mut response = match (req.method(), req.uri().path()) {
         (&Method::POST, "/fetch_code") => {
             let whole_body = hyper::body::to_bytes(req.into_body()).await.unwrap();
             let github_link: GithubLink = serde_json::from_slice(&whole_body).unwrap();
             let code = fetch_code_from_github(github_link.link).await;
             let json = serde_json::to_string(&CodeLines { lines: code }).unwrap();
-            Ok(Response::new(Body::from(json)))
-        },
+            Response::new(Body::from(json))
+        }
         (&Method::GET, "/.well-known/ai-plugin.json") => {
             match fs::read_to_string("./src/static/ai-plugin.json").await {
-                Ok(contents) => Ok(Response::new(Body::from(contents))),
-                Err(_) => Ok(Response::builder().status(StatusCode::NOT_FOUND).body(Body::from("404 - Not Found")).unwrap()),
+                Ok(contents) => Response::new(Body::from(contents)),
+                Err(_) => Response::builder()
+                    .status(StatusCode::NOT_FOUND)
+                    .body(Body::from("404 - Not Found"))
+                    .unwrap(),
             }
-        },
+        }
         (&Method::GET, "/openapi.yaml") => {
             match fs::read_to_string("./src/static/openapi.yaml").await {
-                Ok(contents) => Ok(Response::new(Body::from(contents))),
-                Err(_) => Ok(Response::builder().status(StatusCode::NOT_FOUND).body(Body::from("404 - Not Found")).unwrap()),
+                Ok(contents) => Response::new(Body::from(contents)),
+                Err(_) => Response::builder()
+                    .status(StatusCode::NOT_FOUND)
+                    .body(Body::from("404 - Not Found"))
+                    .unwrap(),
             }
-        },
-        (&Method::GET, "/logo.png") => {
-            match fs::read("./src/static/logo.png").await {
-                Ok(contents) => Ok(Response::new(Body::from(contents))),
-                Err(_) => Ok(Response::builder().status(StatusCode::NOT_FOUND).body(Body::from("404 - Not Found")).unwrap()),
-            }
+        }
+        (&Method::GET, "/logo.png") => match fs::read("./src/static/logo.png").await {
+            Ok(contents) => Response::new(Body::from(contents)),
+            Err(_) => Response::builder()
+                .status(StatusCode::NOT_FOUND)
+                .body(Body::from("404 - Not Found"))
+                .unwrap(),
         },
         _ => {
             let not_found = "Route not found\n";
-            Ok(Response::builder()
+            Response::builder()
                 .status(404)
                 .body(not_found.into())
-                .unwrap())
+                .unwrap()
         }
-    }
+    };
+
+    let headers = response.headers_mut();
+    set_cors_headers(headers);
+
+    Ok(response)
+}
+
+fn set_cors_headers(headers: &mut HeaderMap) {
+    headers.insert(header::ACCESS_CONTROL_ALLOW_ORIGIN, "*".parse().unwrap());
+    headers.insert(
+        header::ACCESS_CONTROL_ALLOW_METHODS,
+        "GET, POST, OPTIONS".parse().unwrap(),
+    );
+    headers.insert(
+        header::ACCESS_CONTROL_ALLOW_HEADERS,
+        "Content-Type".parse().unwrap(),
+    );
 }
 
 fn parse_numbers(num: &str) -> usize {
-    num
-        .chars()
+    num.chars()
         .filter(|a| a.is_digit(10))
         .collect::<String>()
         .parse::<usize>()
