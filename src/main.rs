@@ -96,6 +96,6 @@ mod test {
 
     #[test]
     fn test_parse_digits() {
-        println!("{:?}", parse_numbers("L111")); // prints [1, 2, 3, 4, 5, 6]
+        assert_eq!(111, parse_numbers("L111"));
     }
 }
