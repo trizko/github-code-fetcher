@@ -1,10 +1,11 @@
 use hyper::service::{make_service_fn, service_fn};
 use hyper::Method;
-use hyper::{Body, Request, Response, Server};
+use hyper::{Body, Request, Response, Server, StatusCode};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::convert::Infallible;
 use url::Url;
+use tokio::fs;
 
 #[derive(Deserialize)]
 struct GithubLink {
@@ -25,6 +26,25 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, Infallible
             let code = fetch_code_from_github(github_link.link).await;
             let json = serde_json::to_string(&CodeLines { lines: code }).unwrap();
             Ok(Response::new(Body::from(json)))
+        },
+        (&Method::GET, "/.well-known/ai-plugin.json") => {
+            match fs::read_to_string("./src/static/ai-plugin.json").await {
+                Ok(contents) => Ok(Response::new(Body::from(contents))),
+                Err(_) => Ok(Response::builder().status(StatusCode::NOT_FOUND).body(Body::from("404 - Not Found")).unwrap()),
+            }
+        },
+        (&Method::GET, "/openapi.yaml") => {
+            match fs::read_to_string("./src/static/openapi.yaml").await {
+                Ok(contents) => Ok(Response::new(Body::from(contents))),
+                Err(_) => Ok(Response::builder().status(StatusCode::NOT_FOUND).body(Body::from("404 - Not Found")).unwrap()),
+            }
+        },
+        (&Method::GET, "/logo.png") => {
+            match fs::read("./src/static/logo.png").await {
+                Ok(contents) => Ok(Response::new(Body::from(contents))),
+                Err(_) => Ok(Response::builder().status(StatusCode::NOT_FOUND).body(Body::from("404 - Not Found")).unwrap()),
+            }
+        },
         _ => {
             let not_found = "Route not found\n";
             Ok(Response::builder()
