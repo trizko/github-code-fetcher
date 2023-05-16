@@ -1,0 +1,18 @@
+{
+    "schema_version": "v1",
+    "name_for_human": "Github Code Fetcher",
+    "name_for_model": "github code fetcher",
+    "description_for_human": "A ChatGPT plugin for fetching code from Github links.",
+    "description_for_model": "A ChatGPT plugin for fetching code from Github links.",
+    "auth": {
+        "type": "none"
+    },
+    "api": {
+        "type": "openapi",
+        "url": "http://localhost:3000/openapi.yaml",
+        "is_user_authenticated": false
+    },
+    "logo_url": "http://localhost:3000/logo.png",
+    "contact_email": "tony@strangeloops.ai",
+    "legal_info_url": "http://www.example.com/legal"
+}

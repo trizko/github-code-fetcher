@@ -1,0 +1,38 @@
+openapi: 3.0.1
+info:
+  title: Github Code Fetcher Plugin
+  description: A ChatGPT plugin for fetching code from Github links.
+  version: 'v1'
+servers:
+  - url: http://localhost:3000
+paths:
+  /fetch_code:
+    post:
+      operationId: fetchCode
+      summary: Get the lines of code from the provided link.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                link:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/fetchCodeResponse'
+components:
+  schemas:
+    fetchCodeResponse:
+      type: object
+      properties:
+        lines:
+          type: array
+          items:
+            type: string
+          description: The lines of code.
