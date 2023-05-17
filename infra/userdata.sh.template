@@ -74,7 +74,7 @@ Description=github-code-fetcher
 
 [Service]
 ExecStartPre=docker pull registry.digitalocean.com/ai-stuff-registry/github-code-fetcher:latest
-ExecStart=docker run --init --rm --port 0.0.0.0:3000:3000 --name=github-code-fetcher registry.digitalocean.com/ai-stuff-registry/github-code-fetcher:latest
+ExecStart=docker run --init --rm -p 0.0.0.0:3000:3000 --name=github-code-fetcher registry.digitalocean.com/ai-stuff-registry/github-code-fetcher:latest
 ExecStop=docker stop github-code-fetcher-start
 User=root
 
