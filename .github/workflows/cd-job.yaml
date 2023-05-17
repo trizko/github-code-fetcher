@@ -1,0 +1,58 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo 
+        uses: actions/checkout@v2
+
+      - name: Build image 
+        run: docker build -t ai-stuff-registry/github-code-fetcher .
+
+      - name: Install doctl 
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Log in to DO Container Registry 
+        run: doctl registry login --expiry-seconds 600
+
+      - name: Tag image 
+        run: docker tag ai-stuff-registry/github-code-fetcher registry.digitalocean.com/ai-stuff-registry/github-code-fetcher:latest
+
+      - name: Push image to DO Container Registry 
+        run: docker push registry.digitalocean.com/ai-stuff-registry/github-code-fetcher:latest
+
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_github-code-fetcher-droplet.key
+          chmod 600 ~/.ssh/id_github-code-fetcher-droplet.key
+
+          export SSH_USER="github-code-fetcher"
+          export SSH_HOST="$(doctl compute droplet get github-code-fetcher-droplet --template {{.PublicIPv4}})"
+
+          cat <<EOF > ~/.ssh/config
+          Host github-code-fetcher-droplet
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/id_github-code-fetcher-droplet.key
+            StrictHostKeyChecking no
+          EOF
+
+      - name: Stop github-code-fetcher service
+        run: ssh github-code-fetcher-droplet 'sudo systemctl stop github-code-fetcher'
+
+      - name: Start github-code-fetcher service
+        run: ssh github-code-fetcher-droplet 'sudo systemctl start github-code-fetcher'
+
+      - name: Clean up DO Container Registry
+        run: doctl registry garbage-collection start --include-untagged-manifests --force
