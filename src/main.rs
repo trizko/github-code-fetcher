@@ -59,6 +59,7 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, Infallible
                 .body(Body::from("404 - Not Found"))
                 .unwrap(),
         },
+        (&Method::GET, "/health-check") => Response::new(Body::empty()),
         _ => {
             let not_found = "Route not found\n";
             Response::builder()
