@@ -13,5 +13,6 @@ ENV PORT=3000
 EXPOSE 3000
 
 COPY --from=build-env /app/target/release/github-code-fetcher /
+COPY ./src/static /src/static
 
 ENTRYPOINT ["/github-code-fetcher"]
