@@ -4,7 +4,7 @@ info:
   description: A ChatGPT plugin for fetching code from Github links.
   version: 'v1'
 servers:
-  - url: http://localhost:3000
+  - url: https://github-code-fetcher.strangeloops.ai
 paths:
   /fetch_code:
     post:
