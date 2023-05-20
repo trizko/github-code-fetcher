@@ -26,6 +26,7 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, Infallible
         req.headers()
     );
     let mut response = match (req.method(), req.uri().path()) {
+        (&Method::OPTIONS, "/fetch_code") => Response::new(Body::empty()),
         (&Method::POST, "/fetch_code") => {
             let whole_body = hyper::body::to_bytes(req.into_body()).await.unwrap();
             let github_link: GithubLink = serde_json::from_slice(&whole_body).unwrap();
@@ -33,7 +34,14 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, Infallible
             let json = serde_json::to_string(&CodeLines { lines: code }).unwrap();
             Response::new(Body::from(json))
         }
-        (&Method::OPTIONS, "/fetch_code") => Response::new(Body::empty()),
+        (&Method::OPTIONS, "/fetch_pr") => Response::new(Body::empty()),
+        (&Method::POST, "/fetch_pr") => {
+            let whole_body = hyper::body::to_bytes(req.into_body()).await.unwrap();
+            let github_link: GithubLink = serde_json::from_slice(&whole_body).unwrap();
+            let code = fetch_pr_from_github(github_link.link).await;
+            let json = serde_json::to_string(&CodeLines { lines: code }).unwrap();
+            Response::new(Body::from(json))
+        }
         (&Method::GET, "/.well-known/ai-plugin.json") => {
             match fs::read_to_string("./src/static/ai-plugin.json").await {
                 Ok(contents) => Response::new(Body::from(contents)),
@@ -131,6 +139,30 @@ async fn fetch_code_from_github(link: String) -> Vec<String> {
     };
 
     code
+}
+
+async fn fetch_pr_from_github(link: String) -> Vec<String> {
+    let url = Url::parse(&link).unwrap();
+    let path_parts: Vec<&str> = url.path_segments().unwrap().collect();
+    let user = path_parts[0];
+    let repo = path_parts[1];
+    let pull_number = &path_parts[3];
+
+    let client = Client::new();
+    let raw_url = format!(
+        "https://patch-diff.githubusercontent.com/raw/{}/{}/pull/{}.patch",
+        user, repo, pull_number
+    );
+    let text = client
+        .get(&raw_url)
+        .send()
+        .await
+        .unwrap()
+        .text()
+        .await
+        .unwrap();
+
+    text.lines().map(|s| s.to_string()).collect()
 }
 
 #[tokio::main]
