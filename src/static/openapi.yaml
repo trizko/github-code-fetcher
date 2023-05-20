@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: Github Code Fetcher Plugin
-  description: A ChatGPT plugin for fetching code from Github links.
+  description: A ChatGPT plugin for fetching code and pull requests patches from Github links.
   version: 'v1'
 servers:
   - url: https://github-code-fetcher.strangeloops.ai
@@ -26,6 +26,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/fetchCodeResponse'
+  /fetch_pr:
+    post:
+      operationId: fetchPR
+      summary: Get the lines of a git patch from a Github pull request link.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                link:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/fetchPRResponse'
 components:
   schemas:
     fetchCodeResponse:
@@ -36,3 +56,11 @@ components:
           items:
             type: string
           description: The lines of code.
+    fetchPRResponse:
+      type: object
+      properties:
+        lines:
+          type: array
+          items:
+            type: string
+          description: The lines from the git patch.
