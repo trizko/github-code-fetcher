@@ -1,5 +1,8 @@
 # Github Code Fetcher
 
+![ci-job](https://github.com/trizko/github-code-fetcher/actions/workflows/ci-job.yaml/badge.svg)
+![cd-job](https://github.com/trizko/github-code-fetcher/actions/workflows/cd-job.yaml/badge.svg)
+
 A ChatGPT plugin for fetching code from an online Github repository.
 
 ## Installation
