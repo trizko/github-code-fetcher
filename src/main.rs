@@ -111,7 +111,9 @@ async fn fetch_code_from_github(link: String) -> Vec<String> {
     let user = path_parts[0];
     let repo = path_parts[1];
     let file_path = &path_parts[3..].join("/");
-    let line_numbers: Option<Vec<usize>> = url.fragment().map(|fragment| fragment.split('-').map(parse_numbers).collect());
+    let line_numbers: Option<Vec<usize>> = url
+        .fragment()
+        .map(|fragment| fragment.split('-').map(parse_numbers).collect());
 
     let client = Client::new();
     let raw_url = format!(
