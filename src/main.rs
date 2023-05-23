@@ -99,7 +99,7 @@ fn set_cors_headers(headers: &mut HeaderMap) {
 
 fn parse_numbers(num: &str) -> usize {
     num.chars()
-        .filter(|a| a.is_digit(10))
+        .filter(|a| a.is_ascii_digit())
         .collect::<String>()
         .parse::<usize>()
         .unwrap()
@@ -111,10 +111,7 @@ async fn fetch_code_from_github(link: String) -> Vec<String> {
     let user = path_parts[0];
     let repo = path_parts[1];
     let file_path = &path_parts[3..].join("/");
-    let line_numbers: Option<Vec<usize>> = match url.fragment() {
-        Some(fragment) => Some(fragment.split('-').map(|n| parse_numbers(n)).collect()),
-        None => None,
-    };
+    let line_numbers: Option<Vec<usize>> = url.fragment().map(|fragment| fragment.split('-').map(parse_numbers).collect());
 
     let client = Client::new();
     let raw_url = format!(
