@@ -1,0 +1,434 @@
+_type: export
+__export_format: 4
+__export_date: 2023-05-31T05:00:25.846Z
+__export_source: insomnia.desktop.app:v2023.2.2
+resources:
+  - _id: req_9526cd83a6b44d97af0d0e5339989232
+    parentId: fld_d3fb01d9b38a4a7cbc0e1beba706fc2c
+    modified: 1684367588116
+    created: 1684367568744
+    url: http://localhost:3000/health-check
+    name: Health Check
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1684367568744
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_d3fb01d9b38a4a7cbc0e1beba706fc2c
+    parentId: wrk_5407ae574d1241cf86196811c568e2dd
+    modified: 1685508790825
+    created: 1677103693247
+    name: localhost
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1677103693247
+    _type: request_group
+  - _id: wrk_5407ae574d1241cf86196811c568e2dd
+    parentId: null
+    modified: 1677087073332
+    created: 1677087073332
+    name: New Document
+    description: ""
+    scope: design
+    _type: workspace
+  - _id: req_2769fa56b9274b40b3cff6c47a8140cf
+    parentId: fld_d3fb01d9b38a4a7cbc0e1beba706fc2c
+    modified: 1684268916787
+    created: 1684267056704
+    url: http://localhost:3000/.well-known/ai-plugin.json
+    name: /.well-known/ai-plugin.json
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1684267056704
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_33c03456e5a0400b9308e100cd564916
+    parentId: fld_d3fb01d9b38a4a7cbc0e1beba706fc2c
+    modified: 1684268935632
+    created: 1684268929914
+    url: http://localhost:3000/logo.png
+    name: /logo.png
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1680685375903
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_387b2faebd2b4f6c97139f8a596e7ae8
+    parentId: fld_d3fb01d9b38a4a7cbc0e1beba706fc2c
+    modified: 1684269481609
+    created: 1684269450666
+    url: http://localhost:3000/openapi.yaml
+    name: /openapi.yaml
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1678894535502.5
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_55d54b02a4a44c50a067f9f2fdd3c266
+    parentId: fld_d3fb01d9b38a4a7cbc0e1beba706fc2c
+    modified: 1684358366891
+    created: 1677103695102
+    url: http://localhost:3000/fetch_code
+    name: Fetch Code
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: >-
+        {
+          "link": "https://github.com/trizko/github-code-fetcher/blob/main/src/main.rs"
+        }
+    parameters:
+      - id: pair_3ae441d4b21e4c208af25ce951802f76
+        name: ""
+        value: ""
+        description: ""
+    headers:
+      - name: Content-Type
+        value: application/json
+    authentication: {}
+    metaSortKey: -1677103695102
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_ae049381cbbf4735974d28ebcf22286e
+    parentId: fld_d3fb01d9b38a4a7cbc0e1beba706fc2c
+    modified: 1684602610214
+    created: 1684602386864
+    url: http://localhost:3000/fetch_pr
+    name: Fetch PR
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "link": "https://github.com/huggingface/transformers/pull/23457/files"
+        }
+    parameters:
+      - id: pair_3ae441d4b21e4c208af25ce951802f76
+        name: ""
+        value: ""
+        description: ""
+    headers:
+      - name: Content-Type
+        value: application/json
+    authentication: {}
+    metaSortKey: -1677103003090
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_193700d9d186456e9d26cf8fe624d303
+    parentId: fld_ff9c053582aa4faaabb96b908571ee3c
+    modified: 1685509174345
+    created: 1685509157882
+    url: https://github-code-fetcher.strangeloops.ai/health-check
+    name: Health Check
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1683371636503.75
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_ff9c053582aa4faaabb96b908571ee3c
+    parentId: wrk_5407ae574d1241cf86196811c568e2dd
+    modified: 1685508799205
+    created: 1684362697752
+    name: prod
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1677103680346
+    _type: request_group
+  - _id: req_3a87cf8822cb4d23a3436d5566ca5361
+    parentId: fld_ff9c053582aa4faaabb96b908571ee3c
+    modified: 1685509164388
+    created: 1684362697757
+    url: https://github-code-fetcher.strangeloops.ai/.well-known/ai-plugin.json
+    name: /.well-known/ai-plugin.json
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1682028506203.375
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_a9f84806867d46b98c6d00437d58d4b8
+    parentId: fld_ff9c053582aa4faaabb96b908571ee3c
+    modified: 1684368960912
+    created: 1684362697758
+    url: https://github-code-fetcher.strangeloops.ai/logo.png
+    name: /logo.png
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1680685375903
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_cb6440d47065474dba57484be7f1b8ec
+    parentId: fld_ff9c053582aa4faaabb96b908571ee3c
+    modified: 1684368967323
+    created: 1684362697760
+    url: https://github-code-fetcher.strangeloops.ai/openapi.yaml
+    name: /openapi.yaml
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1678894535502.5
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_d5f95934cdfe42da82a4d6cd6d189b83
+    parentId: fld_ff9c053582aa4faaabb96b908571ee3c
+    modified: 1684366815415
+    created: 1684362697754
+    url: https://github-code-fetcher.strangeloops.ai/fetch_code
+    name: Fetch Code
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: >-
+        {
+          "link": "https://github.com/trizko/github-code-fetcher/blob/main/src/main.rs"
+        }
+    parameters:
+      - id: pair_3ae441d4b21e4c208af25ce951802f76
+        name: ""
+        value: ""
+        description: ""
+    headers:
+      - name: Content-Type
+        value: application/json
+    authentication: {}
+    metaSortKey: -1677103695102
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_ea400e1cab2a46a09fb181a0ea58e064
+    parentId: fld_ff9c053582aa4faaabb96b908571ee3c
+    modified: 1684603618203
+    created: 1684603594146
+    url: https://github-code-fetcher.strangeloops.ai/fetch_pr
+    name: Fetch PR
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "link": "https://github.com/huggingface/transformers/pull/23457/files"
+        }
+    parameters:
+      - id: pair_3ae441d4b21e4c208af25ce951802f76
+        name: ""
+        value: ""
+        description: ""
+    headers:
+      - name: Content-Type
+        value: application/json
+    authentication: {}
+    metaSortKey: -1677103695052
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: env_6e4c9de7820e1b95e4a679d98d965054900fc5e2
+    parentId: wrk_5407ae574d1241cf86196811c568e2dd
+    modified: 1677087073334
+    created: 1677087073334
+    name: Base Environment
+    data: {}
+    dataPropertyOrder: null
+    color: null
+    isPrivate: false
+    metaSortKey: 1677087073334
+    _type: environment
+  - _id: jar_6e4c9de7820e1b95e4a679d98d965054900fc5e2
+    parentId: wrk_5407ae574d1241cf86196811c568e2dd
+    modified: 1677087073335
+    created: 1677087073335
+    name: Default Jar
+    cookies: []
+    _type: cookie_jar
+  - _id: spc_c97e6cb906ed485f903eb7572a75f263
+    parentId: wrk_5407ae574d1241cf86196811c568e2dd
+    modified: 1685509063839
+    created: 1677087073333
+    fileName: github-code-fetcher
+    contents: >-
+      openapi: 3.0.1
+
+      info:
+        title: Github Code Fetcher Plugin
+        description: A ChatGPT plugin for fetching code and pull requests patches from Github links.
+        version: 'v1'
+      servers:
+        - url: https://github-code-fetcher.strangeloops.ai
+      paths:
+        /fetch_code:
+          post:
+            operationId: fetchCode
+            summary: Get the lines of code from the provided link.
+            requestBody:
+              required: true
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      link:
+                        type: string
+            responses:
+              "200":
+                description: OK
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/fetchCodeResponse'
+        /fetch_pr:
+          post:
+            operationId: fetchPR
+            summary: Get the lines of a git patch from a Github pull request link.
+            requestBody:
+              required: true
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      link:
+                        type: string
+            responses:
+              "200":
+                description: OK
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/fetchPRResponse'
+      components:
+        schemas:
+          fetchCodeResponse:
+            type: object
+            properties:
+              lines:
+                type: array
+                items:
+                  type: string
+                description: The lines of code.
+          fetchPRResponse:
+            type: object
+            properties:
+              lines:
+                type: array
+                items:
+                  type: string
+                description: The lines from the git patch.
+    contentType: yaml
+    _type: api_spec
+  - _id: uts_7d290248348c4c19a35d9153062b7ba8
+    parentId: wrk_5407ae574d1241cf86196811c568e2dd
+    modified: 1677087073336
+    created: 1677087073336
+    name: Example Test Suite
+    _type: unit_test_suite
+  - _id: uts_a08570e39ef2486e8086108ecdff8ce9
+    parentId: wrk_5407ae574d1241cf86196811c568e2dd
+    modified: 1677087073336
+    created: 1677087073336
+    name: Example Test Suite
+    _type: unit_test_suite
