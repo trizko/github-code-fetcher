@@ -9,6 +9,7 @@ edition = "2021"
 actix-cors = "0.6.4"
 actix-files = "0.6.2"
 actix-web = "4.3.1"
+env_logger = "0.10.0"
 hyper = { version = "0.14.26", features = ["server"] }
 reqwest = "0.11.17"
 serde = { version = "1.0.163", features = ["derive"] }
