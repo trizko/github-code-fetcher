@@ -1,7 +1,7 @@
 use actix_cors::Cors;
 use actix_files as fs;
-use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use actix_web::middleware::Logger;
+use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -116,7 +116,11 @@ async fn main() -> std::io::Result<()> {
                     .allowed_origin("localhost:3000")
                     .allowed_origin("https://chat.openai.com")
                     .allowed_methods(["GET", "POST", "OPTIONS"])
-                    .allowed_headers(["Content-Type", "openai-conversation-id", "openai-ephemeral-user-id"])
+                    .allowed_headers([
+                        "Content-Type",
+                        "openai-conversation-id",
+                        "openai-ephemeral-user-id",
+                    ]),
             )
             .route("/fetch_code", web::post().to(fetch_code))
             .route("/fetch_pr", web::post().to(fetch_pr))
