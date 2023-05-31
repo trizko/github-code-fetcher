@@ -1,6 +1,7 @@
 use actix_cors::Cors;
 use actix_files as fs;
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
+use actix_web::middleware::Logger;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -101,12 +102,15 @@ async fn health_check() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    env_logger::init_from_env(env_logger::Env::default().default_filter_or("info"));
+
     let host = env::var("HOST").unwrap_or_else(|_| "127.0.0.1".to_string());
     let port = env::var("PORT").unwrap_or_else(|_| "3000".to_string());
     let addr = format!("{}:{}", host, port);
 
     HttpServer::new(|| {
         App::new()
+            .wrap(Logger::default())
             .wrap(
                 Cors::default()
                     .allow_any_origin()
