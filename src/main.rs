@@ -1,6 +1,6 @@
 use actix_cors::Cors;
-use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use actix_files as fs;
+use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::env;
