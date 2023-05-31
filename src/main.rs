@@ -113,9 +113,10 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .wrap(
                 Cors::default()
-                    .allow_any_origin()
-                    .allow_any_method()
-                    .allow_any_header(),
+                    .allowed_origin("localhost:3000")
+                    .allowed_origin("https://chat.openai.com")
+                    .allowed_methods(["GET", "POST", "OPTIONS"])
+                    .allowed_headers(["Content-Type", "openai-conversation-id", "openai-ephemeral-user-id"])
             )
             .route("/fetch_code", web::post().to(fetch_code))
             .route("/fetch_pr", web::post().to(fetch_pr))
