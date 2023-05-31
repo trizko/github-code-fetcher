@@ -1,11 +1,9 @@
-use hyper::service::{make_service_fn, service_fn};
-use hyper::Method;
-use hyper::{header, Body, HeaderMap, Request, Response, Server, StatusCode};
+use actix_cors::Cors;
+use actix_web::{web, App, HttpResponse, HttpServer, Responder};
+use actix_files as fs;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
-use std::convert::Infallible;
-use std::net::SocketAddr;
-use tokio::fs;
+use std::env;
 use url::Url;
 
 #[derive(Deserialize)]
@@ -16,93 +14,6 @@ struct GithubLink {
 #[derive(Serialize)]
 struct CodeLines {
     lines: Vec<String>,
-}
-
-async fn handle_request(req: Request<Body>) -> Result<Response<Body>, Infallible> {
-    println!(
-        "{:?}: {:?}\n headers: {:#?}",
-        req.method(),
-        req.uri().path(),
-        req.headers()
-    );
-    let mut response = match (req.method(), req.uri().path()) {
-        (&Method::OPTIONS, "/fetch_code") => Response::new(Body::empty()),
-        (&Method::POST, "/fetch_code") => {
-            let whole_body = hyper::body::to_bytes(req.into_body()).await.unwrap();
-            let github_link: GithubLink = serde_json::from_slice(&whole_body).unwrap();
-            let code = fetch_code_from_github(github_link.link).await;
-            let json = serde_json::to_string(&CodeLines { lines: code }).unwrap();
-            Response::new(Body::from(json))
-        }
-        (&Method::OPTIONS, "/fetch_pr") => Response::new(Body::empty()),
-        (&Method::POST, "/fetch_pr") => {
-            let whole_body = hyper::body::to_bytes(req.into_body()).await.unwrap();
-            let github_link: GithubLink = serde_json::from_slice(&whole_body).unwrap();
-            let code = fetch_pr_from_github(github_link.link).await;
-            let json = serde_json::to_string(&CodeLines { lines: code }).unwrap();
-            Response::new(Body::from(json))
-        }
-        (&Method::GET, "/.well-known/ai-plugin.json") => {
-            match fs::read_to_string("./src/static/ai-plugin.json").await {
-                Ok(contents) => Response::new(Body::from(contents)),
-                Err(_) => Response::builder()
-                    .status(StatusCode::NOT_FOUND)
-                    .body(Body::from("404 - Not Found"))
-                    .unwrap(),
-            }
-        }
-        (&Method::GET, "/openapi.yaml") => {
-            match fs::read_to_string("./src/static/openapi.yaml").await {
-                Ok(contents) => Response::new(Body::from(contents)),
-                Err(_) => Response::builder()
-                    .status(StatusCode::NOT_FOUND)
-                    .body(Body::from("404 - Not Found"))
-                    .unwrap(),
-            }
-        }
-        (&Method::GET, "/logo.png") => match fs::read("./src/static/logo.png").await {
-            Ok(contents) => Response::new(Body::from(contents)),
-            Err(_) => Response::builder()
-                .status(StatusCode::NOT_FOUND)
-                .body(Body::from("404 - Not Found"))
-                .unwrap(),
-        },
-        (&Method::GET, "/health-check") => Response::new(Body::empty()),
-        _ => {
-            let not_found = "Route not found\n";
-            Response::builder()
-                .status(404)
-                .body(not_found.into())
-                .unwrap()
-        }
-    };
-    let headers = response.headers_mut();
-    set_cors_headers(headers);
-
-    println!("response: {:#?}", response);
-    Ok(response)
-}
-
-fn set_cors_headers(headers: &mut HeaderMap) {
-    headers.insert(header::ACCESS_CONTROL_ALLOW_ORIGIN, "*".parse().unwrap());
-    headers.insert(
-        header::ACCESS_CONTROL_ALLOW_METHODS,
-        "GET, POST, OPTIONS".parse().unwrap(),
-    );
-    headers.insert(
-        header::ACCESS_CONTROL_ALLOW_HEADERS,
-        "Content-Type,openai-conversation-id,openai-ephemeral-user-id"
-            .parse()
-            .unwrap(),
-    );
-}
-
-fn parse_numbers(num: &str) -> usize {
-    num.chars()
-        .filter(|a| a.is_ascii_digit())
-        .collect::<String>()
-        .parse::<usize>()
-        .unwrap()
 }
 
 async fn fetch_code_from_github(link: String) -> Vec<String> {
@@ -164,23 +75,52 @@ async fn fetch_pr_from_github(link: String) -> Vec<String> {
     text.lines().map(|s| s.to_string()).collect()
 }
 
-#[tokio::main]
-async fn main() {
-    let make_svc =
-        make_service_fn(|_conn| async { Ok::<_, Infallible>(service_fn(handle_request)) });
+fn parse_numbers(num: &str) -> usize {
+    num.chars()
+        .filter(|a| a.is_ascii_digit())
+        .collect::<String>()
+        .parse::<usize>()
+        .unwrap()
+}
 
-    let addr: SocketAddr =
-        if let (Ok(host), Ok(port)) = (std::env::var("HOST"), std::env::var("PORT")) {
-            format!("{}:{}", host, port).parse().unwrap()
-        } else {
-            "127.0.0.1:3000".to_string().parse().unwrap()
-        };
-    let server = Server::bind(&addr).serve(make_svc);
+async fn fetch_code(info: web::Json<GithubLink>) -> impl Responder {
+    let code = fetch_code_from_github(info.link.clone()).await;
+    let json = serde_json::to_string(&CodeLines { lines: code }).unwrap();
+    HttpResponse::Ok().body(json)
+}
 
-    println!("listening on {:?}...", server.local_addr());
-    if let Err(e) = server.await {
-        eprintln!("server error: {}", e);
-    }
+async fn fetch_pr(info: web::Json<GithubLink>) -> impl Responder {
+    let code = fetch_pr_from_github(info.link.clone()).await;
+    let json = serde_json::to_string(&CodeLines { lines: code }).unwrap();
+    HttpResponse::Ok().body(json)
+}
+
+async fn health_check() -> impl Responder {
+    HttpResponse::Ok().body("OK")
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    let host = env::var("HOST").unwrap_or_else(|_| "127.0.0.1".to_string());
+    let port = env::var("PORT").unwrap_or_else(|_| "3000".to_string());
+    let addr = format!("{}:{}", host, port);
+
+    HttpServer::new(|| {
+        App::new()
+            .wrap(
+                Cors::default()
+                    .allow_any_origin()
+                    .allow_any_method()
+                    .allow_any_header(),
+            )
+            .route("/fetch_code", web::post().to(fetch_code))
+            .route("/fetch_pr", web::post().to(fetch_pr))
+            .route("/health-check", web::get().to(health_check))
+            .service(fs::Files::new("/", "./src/static/").use_hidden_files())
+    })
+    .bind(addr)?
+    .run()
+    .await
 }
 
 #[cfg(test)]
